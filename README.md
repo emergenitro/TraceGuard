@@ -1,4 +1,4 @@
-# IP Guardian
+# TraceGuard
 
 An AI-powered web application that automatically scans the internet for copyright, patent, trademark, and product IP infringement. Submit your asset, and the system deploys browser agents across relevant websites to find and report potential violations.
 
