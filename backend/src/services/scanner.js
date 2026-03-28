@@ -10,11 +10,13 @@
 import { randomUUID } from "crypto";
 import { analyzeAsset } from "./gemini.js";
 import { bulkScrapeForInfringement } from "./tinyfish.js";
+import { sendScanCompleteEmail } from "./email.js";
 import {
   updateScan,
   addLog,
   addStreamItem,
   createReport,
+  getScanEmail,
 } from "../store.js";
 
 // ── Mapping helpers ───────────────────────────────────────────────────────────
@@ -288,6 +290,16 @@ export async function runScan(scanId, assetData) {
     }
 
     createReport(scanId, infringements);
+
+    const notifyEmail = getScanEmail(scanId);
+    if (notifyEmail) {
+      sendScanCompleteEmail(notifyEmail, {
+        assetName,
+        assetType,
+        infringementCount: infringements.length,
+        scanId,
+      }).catch((err) => console.error("[scanner] Failed to send email:", err));
+    }
   } catch (err) {
     console.error(`[Scanner] Scan ${scanId} failed:`, err);
     addLog(scanId, "ALERT", `Fatal scan error: ${err.message}`);

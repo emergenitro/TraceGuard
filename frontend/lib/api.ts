@@ -7,6 +7,7 @@ export interface StartInvestigationPayload {
   assetType: AssetType;
   assetName: string;
   primaryUrl: string;
+  email?: string;
   file?: File;
 }
 
@@ -78,6 +79,7 @@ export async function startInvestigation(
       assetType: payload.assetType,
       assetName: payload.assetName,
       primaryUrl: payload.primaryUrl,
+      email: payload.email,
       fileName: payload.file?.name,
     }),
   });

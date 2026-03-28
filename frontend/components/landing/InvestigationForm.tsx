@@ -22,6 +22,7 @@ export default function InvestigationForm() {
   const [selectedType, setSelectedType] = useState<AssetType>("trademark");
   const [assetName, setAssetName] = useState("");
   const [primaryUrl, setPrimaryUrl] = useState("");
+  const [email, setEmail] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -44,6 +45,7 @@ export default function InvestigationForm() {
         assetType: selectedType,
         assetName,
         primaryUrl,
+        email: email.trim() || undefined,
         file: file ?? undefined,
       });
       router.push(`/scan/${scanId}`);
@@ -123,6 +125,20 @@ export default function InvestigationForm() {
                   className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data py-3 transition-all placeholder:text-outline/50"
                 />
               </div>
+            </div>
+
+            {/* Email notification */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-label font-bold text-outline uppercase tracking-widest">
+                Notify via Email (optional)
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data py-3 transition-all placeholder:text-outline/50"
+              />
             </div>
 
             {/* File upload */}

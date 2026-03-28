@@ -10,7 +10,7 @@ const router = Router();
  * Returns: { scanId }
  */
 router.post("/", async (req, res) => {
-  const { assetType, assetName, primaryUrl, fileName } = req.body ?? {};
+  const { assetType, assetName, primaryUrl, fileName, email } = req.body ?? {};
 
   if (!assetName || typeof assetName !== "string" || !assetName.trim()) {
     return res.status(400).json({ error: "assetName is required" });
@@ -28,6 +28,7 @@ router.post("/", async (req, res) => {
     assetName: assetName.trim(),
     primaryUrl: primaryUrl?.trim() || undefined,
     fileName: fileName?.trim() || undefined,
+    email: email?.trim() || undefined,
   };
 
   const scanId = createScan(assetType, assetName.trim(), assetData);

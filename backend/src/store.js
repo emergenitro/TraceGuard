@@ -27,8 +27,8 @@ export function createScan(assetType, assetName, assetData) {
       highPriorityRisk: false,
     },
     stream: [],
-    // Internal — stripped before sending to client
     _assetData: assetData,
+    _email: assetData.email ?? null,
   };
   scans.set(id, scan);
   return id;
@@ -36,6 +36,10 @@ export function createScan(assetType, assetName, assetData) {
 
 export function getScan(id) {
   return scans.get(id) ?? null;
+}
+
+export function getScanEmail(id) {
+  return scans.get(id)?._email ?? null;
 }
 
 export function updateScan(id, updates) {
