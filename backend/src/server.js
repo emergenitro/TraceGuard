@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { initDb } from "./db.js";
 
 import investigationsRouter from "./routes/investigations.js";
 import scansRouter from "./routes/scans.js";
@@ -65,9 +66,16 @@ app.use((err, _req, res, _next) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-  console.log(`\n  IP Guardian backend   →  http://localhost:${PORT}`);
-  console.log(`  Health check          →  http://localhost:${PORT}/health`);
-  console.log(`  OpenAI model          →  ${process.env.OPENAI_MODEL || "gpt-4o"}`);
-  console.log();
-});
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`\n  IP Guardian backend   →  http://localhost:${PORT}`);
+      console.log(`  Health check          →  http://localhost:${PORT}/health`);
+      console.log(`  OpenAI model          →  ${process.env.OPENAI_MODEL || "gpt-4o"}`);
+      console.log();
+    });
+  })
+  .catch((err) => {
+    console.error("[startup] Database initialisation failed:", err);
+    process.exit(1);
+  });

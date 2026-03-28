@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
     email: email?.trim() || undefined,
   };
 
-  const scanId = createScan(assetType, assetName.trim(), assetData);
+  const scanId = await createScan(assetType, assetName.trim(), assetData);
 
   // Fire-and-forget — the scan runs asynchronously in the background
   runScan(scanId, assetData).catch((err) =>

@@ -29,7 +29,7 @@ export default function HeroColumn() {
             Total Scans
           </span>
           <span className="text-2xl font-headline font-bold tabular-data">
-            1,402,881
+            5
           </span>
         </div>
         <div className="p-4 bg-surface-container-lowest">

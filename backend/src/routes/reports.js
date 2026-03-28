@@ -7,8 +7,8 @@ const router = Router();
  * GET /api/reports/:scanId
  * Returns the full ReportSummary: { scanId, totalMatches, infringements[] }
  */
-router.get("/:scanId", (req, res) => {
-  const report = getReport(req.params.scanId);
+router.get("/:scanId", async (req, res) => {
+  const report = await getReport(req.params.scanId);
   if (!report) {
     return res.status(404).json({ error: "Report not found. Scan may still be running." });
   }
@@ -25,10 +25,9 @@ router.get("/:scanId", (req, res) => {
 /**
  * POST /api/reports/:scanId/export
  * Generates a downloadable report URL.
- * (In production: generate a real PDF/CSV; here we return a JSON download link.)
  */
-router.post("/:scanId/export", (req, res) => {
-  const report = getReport(req.params.scanId);
+router.post("/:scanId/export", async (req, res) => {
+  const report = await getReport(req.params.scanId);
   if (!report) {
     return res.status(404).json({ error: "Report not found" });
   }
@@ -39,10 +38,10 @@ router.post("/:scanId/export", (req, res) => {
 
 /**
  * GET /api/reports/:scanId/download
- * Streams the report as JSON (placeholder for a real PDF export).
+ * Streams the report as JSON.
  */
-router.get("/:scanId/download", (req, res) => {
-  const report = getReport(req.params.scanId);
+router.get("/:scanId/download", async (req, res) => {
+  const report = await getReport(req.params.scanId);
   if (!report) {
     return res.status(404).json({ error: "Report not found" });
   }
@@ -63,15 +62,14 @@ router.get("/:scanId/download", (req, res) => {
  * POST /api/reports/:scanId/mark-reviewed
  * Bulk-sets all UNACTIONED infringements to PENDING_REVIEW.
  */
-router.post("/:scanId/mark-reviewed", (req, res) => {
-  const report = getReport(req.params.scanId);
+router.post("/:scanId/mark-reviewed", async (req, res) => {
+  const report = await getReport(req.params.scanId);
   if (!report) {
     return res.status(404).json({ error: "Report not found" });
   }
   for (const inf of report.infringements) {
     if (inf.status === "UNACTIONED") {
-      updateInfringement(inf.id, { status: "PENDING_REVIEW" });
-      inf.status = "PENDING_REVIEW"; // Update in-place on the report too
+      await updateInfringement(inf.id, { status: "PENDING_REVIEW" });
     }
   }
   res.status(204).send();

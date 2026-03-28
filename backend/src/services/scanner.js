@@ -143,38 +143,38 @@ export async function runScan(scanId, assetData) {
   try {
     // ── Phase 1: Asset analysis ──────────────────────────────────────────────
 
-    updateScan(scanId, { status: "scanning", progressPercent: 5 });
-    addLog(scanId, "INFO", `Investigation initialised — ${assetType.toUpperCase()}: "${assetName}"`);
-    addLog(scanId, "INFO", "Engaging GPT-4o analysis engine…");
+    await updateScan(scanId, { status: "scanning", progressPercent: 5 });
+    await addLog(scanId, "INFO", `Investigation initialised — ${assetType.toUpperCase()}: "${assetName}"`);
+    await addLog(scanId, "INFO", "Engaging GPT-4o analysis engine…");
 
     let assetAnalysis;
     try {
       assetAnalysis = await analyzeAsset({ assetType, assetName, primaryUrl, fileName });
     } catch (err) {
-      addLog(scanId, "ALERT", `Asset analysis failed: ${err.message}`);
-      updateScan(scanId, { status: "complete", progressPercent: 100 });
-      createReport(scanId, []);
+      await addLog(scanId, "ALERT", `Asset analysis failed: ${err.message}`);
+      await updateScan(scanId, { status: "complete", progressPercent: 100 });
+      await createReport(scanId, []);
       return;
     }
 
-    addLog(
+    await addLog(
       scanId,
       "DATA",
       `Asset profile: ${assetAnalysis.description.slice(0, 160)}${assetAnalysis.description.length > 160 ? "…" : ""}`
     );
-    addLog(
+    await addLog(
       scanId,
       "INFO",
       `${assetAnalysis.targetSites.length} high-value target domains identified for investigation`
     );
-    updateScan(scanId, {
+    await updateScan(scanId, {
       progressPercent: 20,
       telemetry: { detectionConfidence: 40, visualMatching: 25, highPriorityRisk: false },
     });
 
     // ── Phase 2: Dispatch TinyFish agents ────────────────────────────────────
 
-    addLog(scanId, "SCAN", `Deploying ${assetAnalysis.targetSites.length} concurrent scan agents via TinyFish…`);
+    await addLog(scanId, "SCAN", `Deploying ${assetAnalysis.targetSites.length} concurrent scan agents via TinyFish…`);
 
     const goal = buildScrapeGoal(assetType, assetName, assetAnalysis);
 
@@ -185,8 +185,8 @@ export async function runScan(scanId, assetData) {
     }));
 
     for (const t of targets) {
-      addLog(scanId, "SCAN", `Agent dispatched → ${t.url}`);
-      addStreamItem(scanId, {
+      await addLog(scanId, "SCAN", `Agent dispatched → ${t.url}`);
+      await addStreamItem(scanId, {
         action: "AGENT_DISPATCHED",
         url: t.url,
         elapsed: "0ms",
@@ -195,14 +195,14 @@ export async function runScan(scanId, assetData) {
       });
     }
 
-    updateScan(scanId, { progressPercent: 30 });
+    await updateScan(scanId, { progressPercent: 30 });
 
     // ── Concurrent scrape ────────────────────────────────────────────────────
 
     const scrapeResults = await bulkScrapeForInfringement(targets);
 
-    updateScan(scanId, { progressPercent: 75 });
-    addLog(scanId, "INFO", `All agents returned. Processing ${scrapeResults.length} site reports…`);
+    await updateScan(scanId, { progressPercent: 75 });
+    await addLog(scanId, "INFO", `All agents returned. Processing ${scrapeResults.length} site reports…`);
 
     // ── Phase 3: Build infringement list ─────────────────────────────────────
 
@@ -213,11 +213,11 @@ export async function runScan(scanId, assetData) {
       const targetInfo = targets[i];
 
       if (result.error) {
-        addLog(scanId, "INFO", `Inconclusive scan at ${result.url} — ${result.error}`);
+        await addLog(scanId, "INFO", `Inconclusive scan at ${result.url} — ${result.error}`);
       } else if (!result.matches || result.matches.length === 0) {
-        addLog(scanId, "INFO", `No infringement detected at ${extractDomain(result.url)}`);
+        await addLog(scanId, "INFO", `No infringement detected at ${extractDomain(result.url)}`);
       } else {
-        addLog(
+        await addLog(
           scanId,
           "ALERT",
           `${result.matches.length} potential match(es) found via ${extractDomain(result.url)}`
@@ -248,7 +248,7 @@ export async function runScan(scanId, assetData) {
 
         infringements.push(infringement);
 
-        addStreamItem(scanId, {
+        await addStreamItem(scanId, {
           action: severity === "CRITICAL" ? "CRITICAL_MATCH" : "MATCH_DETECTED",
           url: matchLink,
           elapsed: elapsedMs(),
@@ -256,7 +256,7 @@ export async function runScan(scanId, assetData) {
           isAlert: severity === "CRITICAL",
         });
 
-        addLog(
+        await addLog(
           scanId,
           severity === "CRITICAL" ? "ALERT" : "SCAN",
           `${severity} — ${match.product_title ?? extractDomain(matchLink)} @ ${extractDomain(matchLink)}`
@@ -265,7 +265,7 @@ export async function runScan(scanId, assetData) {
 
       // Incremental progress: 75 → 95 over all results
       const pct = 75 + Math.round(((i + 1) / scrapeResults.length) * 20);
-      updateScan(scanId, { progressPercent: pct });
+      await updateScan(scanId, { progressPercent: pct });
     }
 
     // ── Phase 4: Finalise ─────────────────────────────────────────────────────
@@ -276,7 +276,7 @@ export async function runScan(scanId, assetData) {
         ? infringements.reduce((s, i) => s + i.matchPercent, 0) / infringements.length
         : 0;
 
-    updateScan(scanId, {
+    await updateScan(scanId, {
       status: "complete",
       progressPercent: 100,
       telemetry: {
@@ -286,23 +286,23 @@ export async function runScan(scanId, assetData) {
       },
     });
 
-    addLog(
+    await addLog(
       scanId,
       "INFO",
       `Investigation complete — ${infringements.length} infringement(s) identified across ${scrapeResults.length} sites`
     );
 
     if (hasCritical) {
-      addLog(
+      await addLog(
         scanId,
         "ALERT",
         "⚠  CRITICAL severity infringements detected. Immediate legal review recommended."
       );
     }
 
-    createReport(scanId, infringements);
+    await createReport(scanId, infringements);
 
-    const notifyEmail = getScanEmail(scanId);
+    const notifyEmail = await getScanEmail(scanId);
     if (notifyEmail) {
       sendScanCompleteEmail(notifyEmail, {
         assetName,
@@ -313,8 +313,8 @@ export async function runScan(scanId, assetData) {
     }
   } catch (err) {
     console.error(`[Scanner] Scan ${scanId} failed:`, err);
-    addLog(scanId, "ALERT", `Fatal scan error: ${err.message}`);
-    updateScan(scanId, { status: "complete", progressPercent: 100 });
-    createReport(scanId, []);
+    await addLog(scanId, "ALERT", `Fatal scan error: ${err.message}`);
+    await updateScan(scanId, { status: "complete", progressPercent: 100 });
+    await createReport(scanId, []);
   }
 }

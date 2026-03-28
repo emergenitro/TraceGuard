@@ -46,32 +46,20 @@ export default function InfringementCard({ item }: InfringementCardProps) {
   return (
     <article className={`bg-[#1d2026] group relative ${style.border}`}>
       <div className="flex h-full">
-        {/* Screenshot thumbnail */}
-        <div className="w-48 relative overflow-hidden bg-[#0b0e14] shrink-0">
-          {item.screenshotUrl && (
-            <Image
-              src={item.screenshotUrl}
-              alt={`Screenshot of ${item.domain}`}
-              fill
-              className="object-cover opacity-60 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-              unoptimized
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#10131a] to-transparent" />
-          <div
-            className={`absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase ${style.badge}`}
-          >
-            {item.severity}
-          </div>
-        </div>
+
 
         {/* Content */}
         <div className="flex-1 p-5 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start mb-2">
-              <h2 className="font-headline text-lg font-bold leading-tight">
-                {item.domain}
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-headline text-lg font-bold leading-tight">
+                  {item.domain}
+                </h2>
+                <span className={`text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest ${style.badge}`}>
+                  {item.severity}
+                </span>
+              </div>
               <span className={`font-headline font-bold text-2xl ${style.matchColor}`}>
                 {item.matchPercent}%
               </span>

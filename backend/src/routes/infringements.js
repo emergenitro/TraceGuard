@@ -10,15 +10,14 @@ const router = Router();
  * Updates status to CEASE_AND_DESIST_SENT.
  * Returns: { documentId }
  */
-router.post("/:id/cease-and-desist", (req, res) => {
-  const inf = getInfringement(req.params.id);
+router.post("/:id/cease-and-desist", async (req, res) => {
+  const inf = await getInfringement(req.params.id);
   if (!inf) {
     return res.status(404).json({ error: "Infringement not found" });
   }
 
-  updateInfringement(req.params.id, { status: "CEASE_AND_DESIST_SENT" });
+  await updateInfringement(req.params.id, { status: "CEASE_AND_DESIST_SENT" });
 
-  // In production: generate a real C&D PDF via a document service and return its ID
   res.json({ documentId: randomUUID() });
 });
 
@@ -28,8 +27,8 @@ router.post("/:id/cease-and-desist", (req, res) => {
  * Falls back to a Wayback Machine archive search if no direct link is stored.
  * Returns: { traceUrl }
  */
-router.get("/:id/trace", (req, res) => {
-  const inf = getInfringement(req.params.id);
+router.get("/:id/trace", async (req, res) => {
+  const inf = await getInfringement(req.params.id);
   if (!inf) {
     return res.status(404).json({ error: "Infringement not found" });
   }
