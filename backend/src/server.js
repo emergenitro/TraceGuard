@@ -9,7 +9,7 @@ import infringementsRouter from "./routes/infringements.js";
 
 // ── Validate required env vars ────────────────────────────────────────────────
 
-const REQUIRED_ENV = ["GEMINI_API_KEY", "TINYFISH_API_KEY"];
+const REQUIRED_ENV = ["OPENAI_API_KEY", "TINYFISH_API_KEY"];
 const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missing.length) {
   console.error(
@@ -68,6 +68,6 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`\n  IP Guardian backend   →  http://localhost:${PORT}`);
   console.log(`  Health check          →  http://localhost:${PORT}/health`);
-  console.log(`  Gemini model          →  ${process.env.GEMINI_MODEL || "gemini-2.5-flash"}`);
+  console.log(`  OpenAI model          →  ${process.env.OPENAI_MODEL || "gpt-4o"}`);
   console.log();
 });

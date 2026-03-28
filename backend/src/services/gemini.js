@@ -1,76 +1,43 @@
 /**
- * Gemini 2.5 Flash service for IP asset analysis.
+ * OpenAI GPT-4o service for IP asset analysis.
  *
- * Free-tier rate limits (as of 2025):
- *   - 15 RPM  (requests per minute)
- *   - 1 000 000 TPM
- *   - 250 RPD
+ * Uses structured JSON output (response_format: json_object) so the response
+ * is always valid JSON — no markdown stripping needed.
  *
- * We enforce a minimum 4 s gap between requests (~15 RPM ceiling).
+ * Rate limits (Tier 1 as of 2025): 500 RPM / 30 000 TPD — far more headroom
+ * than Gemini's free tier, so we only retry on transient 429s.
  */
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const MODEL = process.env.OPENAI_MODEL || "gpt-4o";
 
-function getModel() {
-  return genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-    generationConfig: {
-      temperature: 0.2, // Low temp for deterministic JSON
-      responseMimeType: "application/json",
-    },
-  });
-}
-
-// ── Rate limiter ──────────────────────────────────────────────────────────────
-
-let lastRequestAt = 0;
-const MIN_INTERVAL_MS = 4_200; // ~14 RPM — slightly under the 15 RPM limit
-
-async function withRateLimit(fn) {
-  const now = Date.now();
-  const wait = MIN_INTERVAL_MS - (now - lastRequestAt);
-  if (wait > 0) await sleep(wait);
-  lastRequestAt = Date.now();
-  return fn();
-}
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// ── Retry helper ──────────────────────────────────────────────────────────────
-
-async function generateWithRetry(prompt, retries = 3) {
+async function chatWithRetry(messages, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      return await withRateLimit(() => getModel().generateContent(prompt));
+      return await client.chat.completions.create({
+        model: MODEL,
+        temperature: 0.2,
+        response_format: { type: "json_object" },
+        messages,
+      });
     } catch (err) {
-      const isQuota =
-        err?.status === 429 ||
-        err?.message?.includes("quota") ||
-        err?.message?.includes("RESOURCE_EXHAUSTED");
-
-      if (isQuota && attempt < retries) {
-        const backoff = attempt * 15_000; // 15s, 30s
-        console.warn(`Gemini quota hit — retrying in ${backoff / 1000}s…`);
+      const is429 = err?.status === 429 || err?.message?.includes("rate limit");
+      if (is429 && attempt < retries) {
+        const backoff = attempt * 10_000; // 10s, 20s
+        console.warn(`[OpenAI] Rate limit hit — retrying in ${backoff / 1000}s…`);
         await sleep(backoff);
         continue;
       }
       throw err;
     }
   }
-}
-
-// ── JSON extraction ───────────────────────────────────────────────────────────
-
-function extractJSON(text) {
-  // Gemini sometimes wraps JSON in markdown fences
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const raw = fenced ? fenced[1] : text;
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("No JSON object found in Gemini response");
-  return JSON.parse(match[0]);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -88,15 +55,17 @@ function extractJSON(text) {
  */
 export async function analyzeAsset({ assetType, assetName, primaryUrl, fileName }) {
   const assetTypeHints = {
-    patent: "Focus on e-commerce sites selling products that implement patented technology, patent databases for prior art, and marketplaces where counterfeit/infringing goods are commonly sold.",
-    trademark: "Focus on domain squatting, e-commerce listings using the same or confusingly similar brand name, social media impersonation accounts, and counterfeit product listings.",
-    copyright: "Focus on image sharing platforms, print-on-demand marketplaces, stock photo sites, e-book stores, and social media for unauthorised reproduction.",
-    product: "Focus on e-commerce platforms, wholesale/manufacturing sites, and marketplaces where counterfeit or knockoff products are commonly sold.",
+    patent:
+      "Focus on e-commerce sites selling products that implement patented technology, patent databases for prior art, and marketplaces where counterfeit/infringing goods are commonly sold.",
+    trademark:
+      "Focus on domain squatting, e-commerce listings using the same or confusingly similar brand name, social media impersonation accounts, and counterfeit product listings.",
+    copyright:
+      "Focus on image sharing platforms, print-on-demand marketplaces, stock photo sites, e-book stores, and social media for unauthorised reproduction.",
+    product:
+      "Focus on e-commerce platforms, wholesale/manufacturing sites, and marketplaces where counterfeit or knockoff products are commonly sold.",
   };
 
-  const prompt = `You are an IP (Intellectual Property) infringement detection specialist.
-
-Analyse the following IP asset and identify the best websites to investigate for potential infringement.
+  const userContent = `Analyse the following IP asset and identify the best websites to investigate for potential infringement.
 
 Asset Type: ${assetType}
 Asset Name: ${assetName}
@@ -105,7 +74,7 @@ ${fileName ? `Reference File: ${fileName}` : ""}
 
 Context: ${assetTypeHints[assetType] ?? ""}
 
-Return a JSON object with exactly this schema (no markdown, no extra text):
+Return a JSON object with exactly this schema:
 {
   "description": "A detailed, factual description of the asset including what it is and what makes it distinctive or protectable.",
   "keyFeatures": ["distinctive element 1", "distinctive element 2", "...up to 8 items"],
@@ -125,7 +94,14 @@ Rules:
 - For PATENT assets, always include at least one patent database (patents.google.com or worldwide.espacenet.com) alongside commercial sites.
 - For TRADEMARK assets, always include at least one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}) to check for domain squatting.`;
 
-  const result = await generateWithRetry(prompt);
-  const text = result.response.text();
-  return extractJSON(text);
+  const completion = await chatWithRetry([
+    {
+      role: "system",
+      content:
+        "You are an IP (Intellectual Property) infringement detection specialist. Always respond with valid JSON only.",
+    },
+    { role: "user", content: userContent },
+  ]);
+
+  return JSON.parse(completion.choices[0].message.content);
 }
