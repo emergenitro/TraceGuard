@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TraceGuard | Active Scan Environment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#434750",
+                        "on-tertiary": "#2c3039",
+                        "primary": "#ffd597",
+                        "surface-variant": "#32353c",
+                        "inverse-on-surface": "#2e3037",
+                        "background": "#10131a",
+                        "tertiary-fixed-dim": "#c3c6d1",
+                        "outline": "#9f8e78",
+                        "on-primary": "#432c00",
+                        "on-surface-variant": "#d7c4ac",
+                        "on-surface": "#e1e2eb",
+                        "surface-container": "#1d2026",
+                        "surface": "#10131a",
+                        "on-primary-container": "#6a4700",
+                        "on-secondary": "#68000b",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#272a31",
+                        "on-secondary-container": "#ffb8b2",
+                        "on-secondary-fixed": "#410004",
+                        "on-primary-fixed-variant": "#614000",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#ffba43",
+                        "inverse-surface": "#e1e2eb",
+                        "tertiary": "#d8dbe6",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#181c24",
+                        "on-error": "#690005",
+                        "primary-fixed": "#ffddaf",
+                        "on-secondary-fixed-variant": "#930014",
+                        "surface-dim": "#10131a",
+                        "secondary": "#ffb3ae",
+                        "surface-container-highest": "#32353c",
+                        "secondary-fixed": "#ffdad7",
+                        "tertiary-container": "#bcbfca",
+                        "primary-fixed-dim": "#ffba43",
+                        "on-background": "#e1e2eb",
+                        "surface-bright": "#363940",
+                        "on-tertiary-container": "#4a4e57",
+                        "secondary-container": "#ad031a",
+                        "surface-container-lowest": "#0b0e14",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "outline-variant": "#524533",
+                        "tertiary-fixed": "#dfe2ee",
+                        "surface-container-low": "#191c22",
+                        "inverse-primary": "#805600",
+                        "primary-container": "#ffb000"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-pulse {
+            box-shadow: 0 0 10px #ffb000;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #32353c;
+        }
+        .scan-line {
+            background: linear-gradient(to bottom, transparent, #ffb000, transparent);
+            height: 100px;
+            width: 100%;
+            position: absolute;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#10131a] dark:bg-[#10131a] w-64">
+<div class="p-6 border-b border-outline-variant/10">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-2 h-2 bg-primary-container status-pulse"></div>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest text-primary">SYSTEM ACTIVE</span>
+</div>
+<p class="font-body text-[10px] text-on-surface-variant tracking-tighter opacity-50">V.2.0.4-STABLE</p>
+</div>
+<nav class="flex-1 mt-4">
+<a class="bg-[#1d2026] text-[#ffb000] border-l-4 border-[#ffb000] py-4 px-6 flex items-center gap-3 active:scale-[0.98] transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="dashboard">dashboard</span>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] active:scale-[0.98] transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="gavel">gavel</span>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest">Infringements</span>
+</a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] active:scale-[0.98] transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="folder_shared">folder_shared</span>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest">Case Files</span>
+</a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] active:scale-[0.98] transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="language">language</span>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest">Global Scan</span>
+</a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] active:scale-[0.98] transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+<span class="font-headline text-xs font-semibold uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+<div class="p-6">
+<button class="w-full bg-primary-container text-on-primary font-headline text-xs font-bold py-4 tracking-widest active:opacity-80 transition-opacity">
+                NEW INVESTIGATION
+            </button>
+</div>
+<div class="mt-auto p-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 p-2 text-[#9f8e78] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help">help</span>
+<span class="font-headline text-[10px] font-semibold uppercase tracking-widest">Support</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-[#9f8e78] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="airedale">airware</span>
+<span class="font-headline text-[10px] font-semibold uppercase tracking-widest">System Status</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 left-64 z-30 bg-[#191c22] dark:bg-[#191c22] flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-bold text-[#ffb000] tracking-tighter font-headline">TraceGuard</h1>
+<div class="h-6 w-[1px] bg-outline-variant/20"></div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-surface-container-lowest border-none text-[10px] font-headline tracking-widest px-10 py-2 w-64 focus:ring-1 focus:ring-primary text-on-surface" placeholder="QUERY DATABASE..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#ffb000] text-sm" data-icon="sensors">sensors</span>
+<span class="text-[10px] font-headline font-bold text-[#ffb000] tracking-widest">UPLINK STABLE</span>
+</div>
+<div class="flex gap-4">
+<button class="text-[#d7c4ac] hover:bg-[#32353c] hover:text-white p-2 transition-colors duration-150 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-[#d7c4ac] hover:bg-[#32353c] hover:text-white p-2 transition-colors duration-150 cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-[60px] p-6 min-h-screen">
+<!-- Dashboard Header -->
+<div class="flex justify-between items-end mb-8 border-b border-outline-variant/10 pb-6">
+<div>
+<p class="font-headline text-[10px] text-primary font-bold tracking-[0.3em] mb-2">OPERATIONAL OVERVIEW</p>
+<h2 class="font-headline text-4xl font-bold text-on-surface tracking-tighter">Live Web Crawl <span class="text-primary-fixed-dim">ID-8829</span></h2>
+</div>
+<div class="text-right">
+<div class="flex items-center justify-end gap-2 mb-1">
+<span class="text-[10px] font-headline text-on-surface-variant tracking-widest">SCAN PROGRESS</span>
+<span class="text-lg font-headline font-bold text-primary">74.2%</span>
+</div>
+<div class="w-64 h-1 bg-surface-container-highest relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-primary-container w-[74.2%]"></div>
+<div class="absolute top-0 left-0 h-full bg-primary w-[30%] opacity-50 blur-sm"></div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Terminal Log (Spans 8 columns) -->
+<div class="col-span-8 bg-surface-container-lowest border border-outline-variant/5 relative overflow-hidden flex flex-col h-[500px]">
+<div class="scan-line"></div>
+<div class="p-4 bg-surface-container flex justify-between items-center border-b border-outline-variant/10">
+<div class="flex gap-2">
+<div class="w-2 h-2 bg-error rounded-full"></div>
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+<div class="w-2 h-2 bg-on-tertiary-fixed-variant rounded-full"></div>
+</div>
+<span class="font-headline text-[10px] tracking-widest text-on-surface-variant">FORENSIC_DAEMON_LOG.SH</span>
+</div>
+<div class="flex-1 p-6 font-mono text-[11px] overflow-y-auto space-y-2 leading-relaxed">
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:11</span>
+<span class="text-primary">[INFO]</span>
+<span class="text-on-surface-variant">Initializing Agent: <span class="text-on-surface">TRACE_ALPHA_09</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:12</span>
+<span class="text-primary">[SCAN]</span>
+<span class="text-on-surface-variant">Crawling: <span class="text-on-surface underline decoration-primary/30">https://amazon.com/dp/B07XJ8C1ML/ref=traceguard_id=8829</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:15</span>
+<span class="text-secondary">[ALERT]</span>
+<span class="text-secondary">Potential Trademark Infringement Detected on Node: HK-0912</span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:18</span>
+<span class="text-primary">[SCAN]</span>
+<span class="text-on-surface-variant">Crawling: <span class="text-on-surface underline decoration-primary/30">https://reddit.com/r/repsneakers/comments/q1w2e3/legit_check_traceguard/</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:22</span>
+<span class="text-tertiary">[DATA]</span>
+<span class="text-on-surface-variant">Indexing 412 assets from Domain: <span class="text-on-surface">aliexpress.com</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:25</span>
+<span class="text-primary">[SCAN]</span>
+<span class="text-on-surface-variant">Crawling: <span class="text-on-surface underline decoration-primary/30">https://ebay.com/itm/33421901231?hash=item4dfa6e1</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:29</span>
+<span class="text-primary">[SCAN]</span>
+<span class="text-on-surface-variant">Crawling: <span class="text-on-surface underline decoration-primary/30">https://shopee.sg/product/11029/332198</span></span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:33</span>
+<span class="text-secondary">[ALERT]</span>
+<span class="text-secondary">Visual Match Found (88% Confidence) - Signature ID: TG-XP-11</span>
+</div>
+<div class="flex gap-4">
+<span class="text-outline-variant">14:02:35</span>
+<span class="text-primary">[SCAN]</span>
+<span class="text-on-surface-variant">Crawling: <span class="text-on-surface underline decoration-primary/30">https://instagram.com/p/CW1_XJ8C1ML/</span></span>
+</div>
+</div>
+<div class="p-2 bg-surface-container-low text-[9px] font-headline text-on-surface-variant flex justify-between px-4">
+<span>AGENT_STATUS: ACTIVE_CRAWL</span>
+<span>PACKETS: 1.2GB/s</span>
+</div>
+</div>
+<!-- Global Nodes Mini-Map (Spans 4 columns) -->
+<div class="col-span-4 space-y-6">
+<div class="bg-surface-container border border-outline-variant/5 p-6 h-[240px] relative overflow-hidden">
+<h3 class="font-headline text-xs font-bold tracking-widest text-on-surface-variant mb-4 uppercase">Global Search Nodes</h3>
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="stylized world map with technical grid lines minimalist dark navy blue color palette blueprint style" data-location="Global" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBihWdqnJuTYF_yAxhmpw5JESFP1nmoIyXZYCxGaj-sOxuKescBDDslyYV_441o5B5m4nbiWfHgmeA3OsmkrVKmuQCeEB6u--kltsKF-YkAvMTfcQOvlb3_w0ELfIeKUndkBs2oDix4JV8vd0FOokm_ZMjz1fAD49talqx7LggknnBB5tvH3lMBYYgVedPiy5044ZrritjJIYaJ76-J7pAhLP-vonqPuww1ASx8smKJjQgB9zHOv4dHmVlgvoTCVtBM9-pF9Y-tX6U"/>
+</div>
+<div class="relative z-10 space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-headline tracking-widest uppercase">North America</span>
+<div class="w-1.5 h-1.5 bg-primary-container status-pulse rounded-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-headline tracking-widest uppercase">Asia-Pacific</span>
+<div class="w-1.5 h-1.5 bg-primary-container status-pulse rounded-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-headline tracking-widest uppercase opacity-40">Europe (Idle)</span>
+<div class="w-1.5 h-1.5 bg-outline-variant rounded-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-headline tracking-widest uppercase">South America</span>
+<div class="w-1.5 h-1.5 bg-primary-container status-pulse rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Live Metrics Card -->
+<div class="bg-surface-container-high p-6 border border-outline-variant/5 h-[236px]">
+<h3 class="font-headline text-xs font-bold tracking-widest text-on-surface-variant mb-6 uppercase">Infringement Telemetry</h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-[10px] font-headline tracking-widest uppercase opacity-70">Detection Confidence</span>
+<span class="text-sm font-headline font-bold text-primary">94.8%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-lowest overflow-hidden">
+<div class="h-full bg-primary w-[94.8%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-[10px] font-headline tracking-widest uppercase opacity-70">Visual Matching</span>
+<span class="text-sm font-headline font-bold text-primary">82.1%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-lowest overflow-hidden">
+<div class="h-full bg-primary w-[82.1%]"></div>
+</div>
+</div>
+<div class="pt-2">
+<div class="flex items-center gap-4 text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+<span class="text-[10px] font-headline font-bold tracking-tighter uppercase">High Priority Risk Detected</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Horizontal Live Stream (Spans 12 columns) -->
+<div class="col-span-12">
+<div class="bg-surface-container-lowest border border-outline-variant/5 p-4 overflow-hidden relative">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="monitor_heart">monitor_heart</span>
+<h3 class="font-headline text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">Real-Time Data Stream</h3>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<!-- Stream Item 1 -->
+<div class="flex-none w-[300px] bg-surface-container p-4 border-l-2 border-primary">
+<div class="flex justify-between mb-2">
+<span class="text-[9px] font-headline tracking-widest uppercase text-on-surface-variant">Analyzing URL</span>
+<span class="text-[9px] font-mono text-primary">0.04s</span>
+</div>
+<p class="text-[11px] font-mono truncate text-on-surface mb-3">amazon.com/product/B01N...-id=82</p>
+<div class="flex gap-2">
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Metadata</span>
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Pricing</span>
+</div>
+</div>
+<!-- Stream Item 2 -->
+<div class="flex-none w-[300px] bg-surface-container p-4 border-l-2 border-primary">
+<div class="flex justify-between mb-2">
+<span class="text-[9px] font-headline tracking-widest uppercase text-on-surface-variant">Scanning Assets</span>
+<span class="text-[9px] font-mono text-primary">0.12s</span>
+</div>
+<p class="text-[11px] font-mono truncate text-on-surface mb-3">twitter.com/ads/campaign/22901-tx</p>
+<div class="flex gap-2">
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Visual</span>
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">OCR</span>
+</div>
+</div>
+<!-- Stream Item 3 -->
+<div class="flex-none w-[300px] bg-surface-container p-4 border-l-2 border-secondary">
+<div class="flex justify-between mb-2">
+<span class="text-[9px] font-headline tracking-widest uppercase text-secondary">Match Identified</span>
+<span class="text-[9px] font-mono text-secondary">0.08s</span>
+</div>
+<p class="text-[11px] font-mono truncate text-on-surface mb-3">aliexpress.com/item/100500...829</p>
+<div class="flex gap-2">
+<span class="text-[8px] bg-secondary-container text-on-secondary-container px-2 py-0.5 font-headline uppercase tracking-widest">Infringement</span>
+</div>
+</div>
+<!-- Stream Item 4 -->
+<div class="flex-none w-[300px] bg-surface-container p-4 border-l-2 border-primary">
+<div class="flex justify-between mb-2">
+<span class="text-[9px] font-headline tracking-widest uppercase text-on-surface-variant">Parsing CSS</span>
+<span class="text-[9px] font-mono text-primary">0.03s</span>
+</div>
+<p class="text-[11px] font-mono truncate text-on-surface mb-3">tiktok.com/shop/checkout/q?u=trace</p>
+<div class="flex gap-2">
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Style</span>
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Font</span>
+</div>
+</div>
+<!-- Stream Item 5 -->
+<div class="flex-none w-[300px] bg-surface-container p-4 border-l-2 border-primary">
+<div class="flex justify-between mb-2">
+<span class="text-[9px] font-headline tracking-widest uppercase text-on-surface-variant">Checking DNS</span>
+<span class="text-[9px] font-mono text-primary">0.01s</span>
+</div>
+<p class="text-[11px] font-mono truncate text-on-surface mb-3">cdn.static.fakedomain.ru/assets</p>
+<div class="flex gap-2">
+<span class="text-[8px] bg-surface-container-highest px-2 py-0.5 font-headline uppercase tracking-widest">Origin</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Overlay Info -->
+<div class="mt-8 flex justify-between items-center text-[10px] font-headline font-medium tracking-widest text-on-surface-variant/40">
+<div class="flex gap-6">
+<span>COORD: 34.0522° N, 118.2437° W</span>
+<span>SYSTEM_ENTROPY: 0.0021</span>
+<span>UPLINK_LATENCY: 14MS</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[12px]" data-icon="lock">lock</span>
+<span>END-TO-END ENCRYPTED FORENSIC SESSION</span>
+</div>
+</div>
+</main>
+</body></html>

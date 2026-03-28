@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Symbols */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grid dot pattern */
+.grid-pattern {
+  background-image: radial-gradient(circle, #32353c 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Status pulse glow */
+.status-pulse {
+  box-shadow: 0 0 10px #ffb000;
+}
+
+/* Tabular data (IP addresses, timestamps, case numbers) */
+.tabular-data {
+  font-feature-settings: "tnum", "onum";
+}
+
+/* Scan line animation */
+.scan-line {
+  background: linear-gradient(to bottom, transparent, #ffb000, transparent);
+  height: 100px;
+  width: 100%;
+  position: absolute;
+  opacity: 0.1;
+  animation: scanDown 3s linear infinite;
+}
+
+@keyframes scanDown {
+  0% {
+    top: -100px;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0e14;
+}
+::-webkit-scrollbar-thumb {
+  background: #32353c;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Status bar terminal cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Warm glow pulse for active monitoring */
+@keyframes warmPulse {
+  0%, 100% { box-shadow: 0 0 6px #ffb000; }
+  50% { box-shadow: 0 0 16px #ffb000, 0 0 30px #ffb00040; }
+}
+.status-pulse-animated {
+  animation: warmPulse 2s ease-in-out infinite;
+}

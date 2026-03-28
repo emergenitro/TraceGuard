@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TraceGuard | Infringement Report</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#434750",
+                        "on-tertiary": "#2c3039",
+                        "primary": "#ffd597",
+                        "surface-variant": "#32353c",
+                        "inverse-on-surface": "#2e3037",
+                        "background": "#10131a",
+                        "tertiary-fixed-dim": "#c3c6d1",
+                        "outline": "#9f8e78",
+                        "on-primary": "#432c00",
+                        "on-surface-variant": "#d7c4ac",
+                        "on-surface": "#e1e2eb",
+                        "surface-container": "#1d2026",
+                        "surface": "#10131a",
+                        "on-primary-container": "#6a4700",
+                        "on-secondary": "#68000b",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#272a31",
+                        "on-secondary-container": "#ffb8b2",
+                        "on-secondary-fixed": "#410004",
+                        "on-primary-fixed-variant": "#614000",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#ffba43",
+                        "inverse-surface": "#e1e2eb",
+                        "tertiary": "#d8dbe6",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#181c24",
+                        "on-error": "#690005",
+                        "primary-fixed": "#ffddaf",
+                        "on-secondary-fixed-variant": "#930014",
+                        "surface-dim": "#10131a",
+                        "secondary": "#ffb3ae",
+                        "surface-container-highest": "#32353c",
+                        "secondary-fixed": "#ffdad7",
+                        "tertiary-container": "#bcbfca",
+                        "primary-fixed-dim": "#ffba43",
+                        "on-background": "#e1e2eb",
+                        "surface-bright": "#363940",
+                        "on-tertiary-container": "#4a4e57",
+                        "secondary-container": "#ad031a",
+                        "surface-container-lowest": "#0b0e14",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "outline-variant": "#524533",
+                        "tertiary-fixed": "#dfe2ee",
+                        "surface-container-low": "#191c22",
+                        "inverse-primary": "#805600",
+                        "primary-container": "#ffb000"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #10131a;
+            color: #e1e2eb;
+            font-family: 'Inter', sans-serif;
+        }
+        .status-pulse {
+            box-shadow: 0 0 10px #ffb000;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0b0e14; }
+        ::-webkit-scrollbar-thumb { background: #32353c; }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- TopNavBar Implementation -->
+<header class="bg-[#191c22] dark:bg-[#191c22] flex justify-between items-center w-full px-6 py-3 fixed top-0 z-50 border-b-0">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-[#ffb000] tracking-tighter font-['Space_Grotesk'] uppercase">TraceGuard</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#d7c4ac] font-['Space_Grotesk'] font-bold uppercase tracking-wider hover:bg-[#32353c] hover:text-white transition-colors duration-150 px-2 py-1" href="#">Dashboard</a>
+<a class="text-[#ffd597] border-b-2 border-[#ffb000] font-['Space_Grotesk'] font-bold uppercase tracking-wider px-2 py-1" href="#">Infringements</a>
+<a class="text-[#d7c4ac] font-['Space_Grotesk'] font-bold uppercase tracking-wider hover:bg-[#32353c] hover:text-white transition-colors duration-150 px-2 py-1" href="#">Case Files</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-[#1d2026] px-3 py-1.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[#ffb000] text-sm">search</span>
+<input class="bg-transparent border-none outline-none text-xs font-['Inter'] uppercase tracking-widest w-48 text-[#d7c4ac] placeholder-[#524533]" placeholder="SEARCH DATABASE..." type="text"/>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-[#ffb000] cursor-pointer active:opacity-80">sensors</span>
+<span class="material-symbols-outlined text-[#ffb000] cursor-pointer active:opacity-80">notifications</span>
+<span class="material-symbols-outlined text-[#ffb000] cursor-pointer active:opacity-80">account_circle</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar Implementation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#10131a] dark:bg-[#10131a] w-64 pt-20 border-r-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-2 h-2 bg-[#ffb000] status-pulse"></div>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest text-[#ffb000]">SYSTEM ACTIVE</span>
+</div>
+<span class="text-[10px] text-[#9f8e78] font-mono tracking-tighter">V.2.0.4-STABLE</span>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] transition-all duration-200 active:scale-[0.98] font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="bg-[#1d2026] text-[#ffb000] border-l-4 border-[#ffb000] py-4 px-6 flex items-center gap-3 font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">gavel</span> Infringements
+            </a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] transition-all duration-200 active:scale-[0.98] font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">folder_shared</span> Case Files
+            </a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] transition-all duration-200 active:scale-[0.98] font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">language</span> Global Scan
+            </a>
+<a class="text-[#9f8e78] py-4 px-6 flex items-center gap-3 hover:bg-[#191c22] hover:text-[#ffd597] transition-all duration-200 active:scale-[0.98] font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+<div class="mt-8 px-6">
+<button class="w-full bg-[#ffb000] text-[#432c00] py-3 text-[10px] font-bold tracking-widest uppercase hover:brightness-110 active:scale-95 transition-all">
+                    NEW INVESTIGATION
+                </button>
+</div>
+</nav>
+<div class="p-4 bg-[#0b0e14]">
+<a class="text-[#9f8e78] py-2 px-2 flex items-center gap-3 hover:text-[#ffb000] text-[10px] font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Support
+            </a>
+<a class="text-[#9f8e78] py-2 px-2 flex items-center gap-3 hover:text-[#ffb000] text-[10px] font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-sm">airware</span> System Status
+            </a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 pt-16 h-screen flex flex-col bg-[#10131a]">
+<!-- Dashboard Header Actions -->
+<section class="p-6 bg-[#1d2026] flex justify-between items-end">
+<div>
+<h1 class="font-['Space_Grotesk'] text-3xl font-bold uppercase tracking-tight text-[#e1e2eb]">Infringement Report</h1>
+<p class="font-['Inter'] text-xs text-[#d7c4ac] mt-1 uppercase tracking-widest">Live Monitoring Result: 1,204 Matches Detected</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-[#32353c] text-[#ffd597] px-4 py-2 text-[10px] font-bold tracking-widest uppercase hover:bg-[#363940] flex items-center gap-2 border border-[#524533]">
+<span class="material-symbols-outlined text-sm">download</span> EXPORT REPORT
+                </button>
+<button class="bg-[#ffb000] text-[#432c00] px-4 py-2 text-[10px] font-bold tracking-widest uppercase hover:brightness-110">
+                    MARK ALL AS REVIEWED
+                </button>
+</div>
+</section>
+<!-- Dynamic Layout: Filters + Results -->
+<section class="flex-1 flex overflow-hidden">
+<!-- Sidebar Filters -->
+<aside class="w-64 bg-[#0b0e14] p-6 overflow-y-auto space-y-8 border-r border-[#1d2026]/10">
+<div>
+<h3 class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest text-[#ffb000] mb-4">SEVERITY</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">CRITICAL (HIGH RISK)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">MODERATE (AMBER)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">OBSERVATIONAL</span>
+</label>
+</div>
+</div>
+<div>
+<h3 class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest text-[#ffb000] mb-4">SOURCE TYPE</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">DOMAIN SQUATTING</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">SOCIAL MEDIA</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">E-COMMERCE</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 bg-[#191c22] border-[#524533] text-[#ffb000] rounded-none focus:ring-0" type="checkbox"/>
+<span class="text-xs text-[#d7c4ac] group-hover:text-white transition-colors">NFT/CRYPTO</span>
+</label>
+</div>
+</div>
+<div>
+<h3 class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest text-[#ffb000] mb-4">STATUS</h3>
+<select class="w-full bg-[#191c22] border-[#524533] text-[#d7c4ac] text-xs py-2 px-3 rounded-none outline-none focus:border-[#ffb000]">
+<option>UNACTIONED</option>
+<option>PENDING REVIEW</option>
+<option>CEASE &amp; DESIST SENT</option>
+<option>LITIGATION</option>
+</select>
+</div>
+</aside>
+<!-- Results Grid -->
+<main class="flex-1 overflow-y-auto p-6 bg-[#10131a]">
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<!-- Result Card 1 (High Risk) -->
+<article class="bg-[#1d2026] group relative border-l-4 border-[#ffb3ae]">
+<div class="flex h-full">
+<div class="w-48 relative overflow-hidden bg-[#0b0e14]">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0" data-alt="Technical dashboard screenshot with code snippets and glowing red alert indicators on a dark futuristic background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJO_B8hxKv_7l5MvSuENQCeUXXH0Ozv7M4M6HtMd8-2VKV8qrySPWF0zp5Mf0YywAFhTnaob0r21kTmFWOz61BsTSAuV9vvD3Y5DXV6cXoCbEM1u0liyanq2j0LP2Bnjh3be0Z3pc7IpX_R91JKYviMorZ_YaFxRzryqv_ORfIBCdAHmQkdZ14gtlPhBZVoIb6jLkcQ8REzSS1NWDL0Rmj7dGYvVtcje6lLSRyuGZImHg72Zmb7gjsHcuyloh88fEFNe68t7IVMFQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#10131a] to-transparent"></div>
+<div class="absolute top-2 left-2 bg-[#930014] text-white text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">CRITICAL</div>
+</div>
+<div class="flex-1 p-5 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-['Space_Grotesk'] text-lg font-bold leading-tight">traceguard-security.io</h2>
+<span class="text-[#ffb3ae] font-['Space_Grotesk'] font-bold text-2xl">98%</span>
+</div>
+<div class="flex gap-2 mb-3">
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#ffb4ab] border border-[#930014]/30 uppercase tracking-widest">Trademark</span>
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#d7c4ac] uppercase tracking-widest">Phishing Risk</span>
+</div>
+<p class="text-[#d7c4ac] text-xs leading-relaxed mb-4 italic border-l border-[#524533] pl-3">
+<span class="text-[#ffb000] font-bold uppercase text-[9px] block mb-1">System Note:</span>
+                                        Exact visual match of brand assets and CSS structure identified on unauthorized domain.
+                                    </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110">DRAFT CEASE &amp; DESIST</button>
+<button class="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c]">VIEW FULL TRACE</button>
+</div>
+</div>
+</div>
+</article>
+<!-- Result Card 2 (Medium Risk) -->
+<article class="bg-[#1d2026] group relative border-l-4 border-[#ffb000]">
+<div class="flex h-full">
+<div class="w-48 relative overflow-hidden bg-[#0b0e14]">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0" data-alt="Digital analytics data visualization screen with multiple charts and graphs in amber and gray tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmflssHf32kWcZlDmvH49ACcIgthl9ekjx5yM2c3QITsCbxdcNDtkD7OkiNAfj30vFT7ermBVC4TREsM2sJxhAKKni5OrhBt8gcSBcaFMzhMXTfgmF7-pykFpyxfbLMzJOIrAbZZXavHbT_UCpl2WkCaX_MCa-dMCj37TiQ4h3Sp_NCf_OgECcHEw98b87u8kgV3LHB9oAjPY0PWS0LixgorHjZSaoHXLH-VNcLeb3qXTtev9Ql14kCSA0MP0fXOVZuUVcGYkXc-Y"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#10131a] to-transparent"></div>
+<div class="absolute top-2 left-2 bg-[#6a4700] text-white text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">MODERATE</div>
+</div>
+<div class="flex-1 p-5 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-['Space_Grotesk'] text-lg font-bold leading-tight">shop-traceguard.com</h2>
+<span class="text-[#ffb000] font-['Space_Grotesk'] font-bold text-2xl">84%</span>
+</div>
+<div class="flex gap-2 mb-3">
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#ffb000] border border-[#6a4700]/30 uppercase tracking-widest">Copyright</span>
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#d7c4ac] uppercase tracking-widest">Logo Misuse</span>
+</div>
+<p class="text-[#d7c4ac] text-xs leading-relaxed mb-4 italic border-l border-[#524533] pl-3">
+<span class="text-[#ffb000] font-bold uppercase text-[9px] block mb-1">System Note:</span>
+                                        Detected unlicensed use of "Sentinel" icon pack in hero section and footer.
+                                    </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110">DRAFT CEASE &amp; DESIST</button>
+<button class="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c]">VIEW FULL TRACE</button>
+</div>
+</div>
+</div>
+</article>
+<!-- Result Card 3 (High Risk) -->
+<article class="bg-[#1d2026] group relative border-l-4 border-[#ffb3ae]">
+<div class="flex h-full">
+<div class="w-48 relative overflow-hidden bg-[#0b0e14]">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0" data-alt="Conceptual cybersecurity web page mockup on a monitor in a dark room with focused dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxzIeUdxrv37kZzA5bVWg1ne6jUvAzBKmTshE_JYul8FNFLvstA-prkm3L9QX_WKKrWQno1rfubjbVs2p8hhQOJlRbpiS_e2Ns8AKrf0FWqoSSGC_RnhOFxjnC1eia3laFXycjaC_QfFUf8kIIgR4-c4Z2l7plKx1-RUj1O6EOAmLs7VV57KcTfJzuja9Qf0KykqxMXiH2LOj_IAO3FURXflUd1Ab9dooXB_45sRUDDwHNh5KMnjqsn5uAQWX8ea4KNGbBOWKRLn8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#10131a] to-transparent"></div>
+<div class="absolute top-2 left-2 bg-[#930014] text-white text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">CRITICAL</div>
+</div>
+<div class="flex-1 p-5 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-['Space_Grotesk'] text-lg font-bold leading-tight">official-traceguard.net</h2>
+<span class="text-[#ffb3ae] font-['Space_Grotesk'] font-bold text-2xl">94%</span>
+</div>
+<div class="flex gap-2 mb-3">
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#ffb4ab] border border-[#930014]/30 uppercase tracking-widest">Trademark</span>
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#d7c4ac] uppercase tracking-widest">Typosquatting</span>
+</div>
+<p class="text-[#d7c4ac] text-xs leading-relaxed mb-4 italic border-l border-[#524533] pl-3">
+<span class="text-[#ffb000] font-bold uppercase text-[9px] block mb-1">System Note:</span>
+                                        High similarity in keyword density and meta-tag structure indicates intentional imitation.
+                                    </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110">DRAFT CEASE &amp; DESIST</button>
+<button class="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c]">VIEW FULL TRACE</button>
+</div>
+</div>
+</div>
+</article>
+<!-- Result Card 4 (Medium Risk) -->
+<article class="bg-[#1d2026] group relative border-l-4 border-[#ffb000]">
+<div class="flex h-full">
+<div class="w-48 relative overflow-hidden bg-[#0b0e14]">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0" data-alt="Abstract code on a dark background with orange glowing highlights representing software security audit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEArMTCfcNpQsC-VB9GLFaErwAisJSgmTcvhg9Q_t2LYIENJoOgIGzOwb6Vvkauc8RBmSPIQbWJhSao_g9eJfc09Z_rnLUm7gcfn0_eyDOuFYJ7kNiATK4EQ_L6tupmXemyYATPyic1vGJZ0lkLc6wZnY3Ol6fR4iff7zpCkx1JF1IGysSPftPjqckaPwisd1AsFMQjG4cJI1pSK-ljteVqX5-Oll8ALEwJdqReapQlofeC2avfaZG3kRegqx0QT28iXgNOVKV4Zo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#10131a] to-transparent"></div>
+<div class="absolute top-2 left-2 bg-[#6a4700] text-white text-[9px] font-black px-2 py-0.5 tracking-tighter uppercase">MODERATE</div>
+</div>
+<div class="flex-1 p-5 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-['Space_Grotesk'] text-lg font-bold leading-tight">tg-monitoring-app.biz</h2>
+<span class="text-[#ffb000] font-['Space_Grotesk'] font-bold text-2xl">72%</span>
+</div>
+<div class="flex gap-2 mb-3">
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#ffb000] border border-[#6a4700]/30 uppercase tracking-widest">Copyright</span>
+<span class="text-[9px] font-bold px-2 py-0.5 bg-[#32353c] text-[#d7c4ac] uppercase tracking-widest">Asset Scrape</span>
+</div>
+<p class="text-[#d7c4ac] text-xs leading-relaxed mb-4 italic border-l border-[#524533] pl-3">
+<span class="text-[#ffb000] font-bold uppercase text-[9px] block mb-1">System Note:</span>
+                                        Partial match of technical documentation text and API endpoint examples.
+                                    </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110">DRAFT CEASE &amp; DESIST</button>
+<button class="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c]">VIEW FULL TRACE</button>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+</section>
+<!-- Status Bar -->
+<footer class="bg-[#0b0e14] border-t border-[#1d2026] px-6 py-2 flex justify-between items-center text-[9px] font-['Inter'] font-semibold tracking-[0.2em] uppercase text-[#9f8e78]">
+<div class="flex gap-6">
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-[#ffb000]"></span> DATABASE SYNC: 100%</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-[#ffb000]"></span> ACTIVE SCANS: 42</span>
+</div>
+<div class="flex gap-6">
+<span>LATENCY: 12ms</span>
+<span class="text-[#ffb000]">SECURE_SOCKET_ESTABLISHED</span>
+</div>
+</footer>
+</main>
+</body></html>
