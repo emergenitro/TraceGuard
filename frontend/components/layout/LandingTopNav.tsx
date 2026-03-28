@@ -10,9 +10,7 @@ export default function LandingTopNav({
   activeTab = "monitor",
 }: LandingTopNavProps) {
   const tabs = [
-    { id: "monitor" as const, label: "Monitor", href: "/" },
-    { id: "archive" as const, label: "Archive", href: "/archive" },
-    { id: "network" as const, label: "Network", href: "/network" },
+    { id: "monitor" as const, label: "Monitor", href: "/" }
   ];
 
   return (

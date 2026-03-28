@@ -58,9 +58,6 @@ export default function ReportPage() {
               <a className="text-[#ffd597] border-b-2 border-[#ffb000] font-headline font-bold uppercase tracking-wider px-2 py-1 text-sm cursor-pointer">
                 Infringements
               </a>
-              <a className="text-[#d7c4ac] font-headline font-bold uppercase tracking-wider hover:bg-[#32353c] hover:text-white transition-colors duration-150 px-2 py-1 text-sm cursor-pointer">
-                Case Files
-              </a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
