@@ -1,11 +1,9 @@
-import pg from "pg";
-const { Pool } = pg;
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  max: 10,
-});
+neonConfig.webSocketConstructor = ws;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export default pool;
 

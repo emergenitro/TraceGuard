@@ -10,35 +10,39 @@ const router = Router();
  * Returns: { scanId }
  */
 router.post("/", async (req, res) => {
-  const { assetType, assetName, primaryUrl, fileName, email } = req.body ?? {};
+  try {
+    const { assetType, assetName, primaryUrl, fileName, email } = req.body ?? {};
 
-  if (!assetName || typeof assetName !== "string" || !assetName.trim()) {
-    return res.status(400).json({ error: "assetName is required" });
+    if (!assetName || typeof assetName !== "string" || !assetName.trim()) {
+      return res.status(400).json({ error: "assetName is required" });
+    }
+
+    const validTypes = ["trademark", "copyright", "product", "patent"];
+    if (!validTypes.includes(assetType)) {
+      return res
+        .status(400)
+        .json({ error: `assetType must be one of: ${validTypes.join(", ")}` });
+    }
+
+    const assetData = {
+      assetType,
+      assetName: assetName.trim(),
+      primaryUrl: primaryUrl?.trim() || undefined,
+      fileName: fileName?.trim() || undefined,
+      email: email?.trim() || undefined,
+    };
+
+    const scanId = await createScan(assetType, assetName.trim(), assetData);
+
+    runScan(scanId, assetData).catch((err) =>
+      console.error(`[investigations] Background scan ${scanId} crashed:`, err)
+    );
+
+    res.status(201).json({ scanId });
+  } catch (err) {
+    console.error("[investigations] Failed to create scan:", err);
+    res.status(500).json({ error: "Failed to start investigation" });
   }
-
-  const validTypes = ["trademark", "copyright", "product", "patent"];
-  if (!validTypes.includes(assetType)) {
-    return res
-      .status(400)
-      .json({ error: `assetType must be one of: ${validTypes.join(", ")}` });
-  }
-
-  const assetData = {
-    assetType,
-    assetName: assetName.trim(),
-    primaryUrl: primaryUrl?.trim() || undefined,
-    fileName: fileName?.trim() || undefined,
-    email: email?.trim() || undefined,
-  };
-
-  const scanId = await createScan(assetType, assetName.trim(), assetData);
-
-  // Fire-and-forget — the scan runs asynchronously in the background
-  runScan(scanId, assetData).catch((err) =>
-    console.error(`[investigations] Background scan ${scanId} crashed:`, err)
-  );
-
-  res.status(201).json({ scanId });
 });
 
 export default router;
