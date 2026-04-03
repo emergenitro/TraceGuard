@@ -116,12 +116,13 @@ Return your findings as a JSON object with ONLY this structure (no markdown, no 
 {
   "matches": [
     {
-      "link": "direct URL to the specific infringing product, listing, or content page",
+      "link": "the exact final URL of the specific infringing product, listing, or content page after following any navigation or redirects — not the homepage or search URL",
       "product_title": "exact name of the product, listing, or content",
       "reason": "cite which specific key feature(s) from the list above are replicated and how",
       "matched_features": ["exact feature from the list that is matched", "another matched feature"],
       "risk_level": "HIGH",
-      "similarity_score": "HIGH"
+      "similarity_score": "HIGH",
+      "match_percent": 92
     }
   ]
 }
@@ -130,6 +131,12 @@ risk_level / similarity_score values:
   HIGH   — replicates a core feature directly or is an obvious copy/counterfeit
   MEDIUM — implements the same concept with minor differences
   LOW    — partial overlap or functional similarity worth monitoring
+
+match_percent: an integer from 0–100 representing how closely this item matches the protected asset.
+  HIGH risk   → 80–100
+  MEDIUM risk → 55–79
+  LOW risk    → 25–54
+Use your judgment within the range — do not pick the same number for every result.
 
 Err on the side of inclusion — if you are unsure, flag it as LOW rather than omitting it.
 If after completing all mandatory steps you find genuinely nothing related, return: {"matches": []}`;
@@ -227,12 +234,14 @@ export async function runScan(scanId, assetData) {
       for (const match of result.matches ?? []) {
         const risk = match.risk_level ?? match.similarity_score ?? "LOW";
         const severity = mapRiskToSeverity(risk);
-        const matchLink = match.link ?? result.url;
+        const matchLink = match.link ?? result.raw?.final_url ?? result.url;
 
         const infringement = {
           id: randomUUID(),
           domain: extractDomain(matchLink),
-          matchPercent: riskToPercent(risk),
+          matchPercent: typeof match.match_percent === "number"
+            ? Math.min(100, Math.max(0, Math.round(match.match_percent)))
+            : riskToPercent(risk),
           severity,
           tags: (match.matched_features ?? []).slice(0, 4),
           sourceType: inferSourceType(targetInfo.category, matchLink),

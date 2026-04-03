@@ -65,11 +65,10 @@ async function pollUntilDone(runId, url) {
     const { status, result, error } = data;
 
     if (status === "COMPLETED") {
-      // result is already parsed JSON (TinyFish parses the agent's JSON output)
       const matches = Array.isArray(result)
         ? result
         : result?.matches ?? [];
-      return { url, matches, raw: result };
+      return { url, matches, raw: { ...data, final_url: data.final_url ?? data.page_url ?? null } };
     }
 
     if (status === "FAILED" || status === "CANCELLED") {
