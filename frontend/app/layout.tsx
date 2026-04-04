@@ -6,6 +6,29 @@ export const metadata: Metadata = {
   title: "TraceGuard | Intellectual Property Monitoring",
   description:
     "Forensic-level intellectual property monitoring. Global real-time scanning for unauthorized trademark, patent, and copyright infringements.",
+  openGraph: {
+    title: "TraceGuard | Intellectual Property Monitoring",
+    description:
+      "Forensic-level intellectual property monitoring. Global real-time scanning for unauthorized trademark, patent, and copyright infringements.",
+    url: "https://trace-guard-omega.vercel.app",
+    siteName: "TraceGuard",
+    images: [
+      {
+        url: "https://trace-guard-omega.vercel.app/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "TraceGuard - IP Monitoring",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TraceGuard | Intellectual Property Monitoring",
+    description:
+      "Forensic-level intellectual property monitoring. Global real-time scanning for unauthorized trademark, patent, and copyright infringements.",
+    images: ["https://trace-guard-omega.vercel.app/opengraph-image"],
+  },
 };
 
 export default function RootLayout({
