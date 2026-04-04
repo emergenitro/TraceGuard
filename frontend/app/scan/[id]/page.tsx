@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getScan, type ScanStatus } from "@/lib/api";
-import AppSidebar from "@/components/layout/AppSidebar";
-import AppTopNav from "@/components/layout/AppTopNav";
+import { useAuth } from "@/lib/auth-context";
+import LandingTopNav from "@/components/layout/LandingTopNav";
 import TerminalLog from "@/components/scan/TerminalLog";
 import DataStream from "@/components/scan/DataStream";
 import Link from "next/link";
@@ -13,8 +13,14 @@ const POLL_INTERVAL_MS = 3_000;
 
 export default function ScanPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
   const [scan, setScan] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && !user) router.replace("/login");
+  }, [user, isLoading, router]);
 
   const fetchScan = useCallback(async () => {
     try {
@@ -48,9 +54,8 @@ export default function ScanPage() {
   if (error) {
     return (
       <>
-        <AppSidebar />
-        <AppTopNav />
-        <main className="ml-64 mt-[60px] p-6 min-h-screen flex items-center justify-center">
+        <LandingTopNav />
+        <main className="mt-[60px] p-6 min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <span className="material-symbols-outlined text-4xl text-secondary">error</span>
             <p className="font-headline text-sm text-secondary tracking-widest uppercase">Scan Error</p>
@@ -69,9 +74,8 @@ export default function ScanPage() {
   if (!scan) {
     return (
       <>
-        <AppSidebar />
-        <AppTopNav />
-        <main className="ml-64 mt-[60px] p-6 min-h-screen flex items-center justify-center">
+        <LandingTopNav />
+        <main className="mt-[60px] p-6 min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
             <p className="font-headline text-sm text-primary tracking-widest uppercase">Initialising Investigation…</p>
@@ -86,10 +90,9 @@ export default function ScanPage() {
 
   return (
     <>
-      <AppSidebar />
-      <AppTopNav />
+      <LandingTopNav />
 
-      <main className="ml-64 mt-[60px] p-6 min-h-screen">
+      <main className="mt-[60px] p-6 min-h-screen">
         {/* Dashboard header */}
         <div className="flex justify-between items-end mb-8 border-b border-[#524533]/10 pb-6">
           <div>
@@ -140,18 +143,6 @@ export default function ScanPage() {
           <DataStream items={scan.stream} />
         </div>
 
-        {/* Footer metadata */}
-        <div className="mt-8 flex justify-between items-center text-[10px] font-headline font-medium tracking-widest text-on-surface-variant/40">
-          <div className="flex gap-6">
-            <span>COORD: 34.0522° N, 118.2437° W</span>
-            <span>SYSTEM_ENTROPY: 0.0021</span>
-            <span>UPLINK_LATENCY: 14MS</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[12px]">lock</span>
-            <span>END-TO-END ENCRYPTED FORENSIC SESSION</span>
-          </div>
-        </div>
       </main>
     </>
   );

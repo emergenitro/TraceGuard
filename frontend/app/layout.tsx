@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: "TraceGuard | Intellectual Property Monitoring",
@@ -27,7 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-surface antialiased">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

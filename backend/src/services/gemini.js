@@ -40,6 +40,25 @@ async function chatWithRetry(messages, retries = 3) {
   }
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function searchForRipoffs(assetName, assetType, primaryUrl) {
+  const response = await client.responses.create({
+    model: MODEL,
+    tools: [{ type: "web_search_preview" }],
+    input: `Research the IP asset "${assetName}" (type: ${assetType}).${primaryUrl ? ` Official URL: ${primaryUrl}.` : ""}
+
+Search the web for:
+1. Factual details about this asset — what it actually is, who owns it, and what makes it legally distinctive or protectable
+2. Known knockoffs, ripoffs, counterfeits, copycats, or products/content that may be infringing on it — include specific product names, sellers, or domains if found
+3. Platforms and websites where copies or infringing content have already appeared or are most likely to appear
+
+Be specific. Cite actual findings where possible.`,
+  });
+
+  return response.output_text ?? "";
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -65,7 +84,13 @@ export async function analyzeAsset({ assetType, assetName, primaryUrl, fileName 
       "Focus on e-commerce platforms, wholesale/manufacturing sites, and marketplaces where counterfeit or knockoff products are commonly sold.",
   };
 
-  const userContent = `Analyse the following IP asset and identify the best websites to investigate for potential infringement.
+  const liveResearch = await searchForRipoffs(assetName, assetType, primaryUrl);
+
+  const userContent = `You are an IP infringement detection specialist. Use the live research below to produce an accurate analysis.
+
+── LIVE WEB RESEARCH ──
+${liveResearch}
+── END RESEARCH ──
 
 Asset Type: ${assetType}
 Asset Name: ${assetName}
@@ -74,25 +99,26 @@ ${fileName ? `Reference File: ${fileName}` : ""}
 
 Context: ${assetTypeHints[assetType] ?? ""}
 
-Return a JSON object with exactly this schema:
+Using the research above as your primary source of truth, return a JSON object with exactly this schema:
 {
-  "description": "A detailed, factual description of the asset including what it is and what makes it distinctive or protectable.",
+  "description": "A detailed, factual description of the asset based on what you found — what it is, who owns it, and what makes it legally distinctive or protectable. If the research found known ripoffs or copycats, briefly mention them here.",
   "keyFeatures": ["distinctive element 1", "distinctive element 2", "...up to 8 items"],
-  "keywords": ["keyword1", "keyword2", "...up to 10 search terms likely to reveal infringing content"],
+  "keywords": ["keyword1", "keyword2", "...up to 10 search terms likely to reveal infringing content, derived from the research"],
   "targetSites": [
     {
       "url": "https://full-url-of-site-homepage-or-search-page",
-      "rationale": "One sentence explaining why this site is a high-value target",
+      "rationale": "One sentence explaining why this site is a high-value target — prefer sites where infringing content was actually found in the research",
       "category": "E_COMMERCE | SOCIAL_MEDIA | DOMAIN_SQUATTING | NFT_CRYPTO | PATENT_DATABASE | MARKETPLACE"
     }
   ]
 }
 
 Rules:
-- targetSites must have between 3 and 4 entries, ordered by likelihood of infringement (highest first).
+- targetSites must have between 3 and 4 entries, ordered by likelihood of infringement (highest first). Prioritise sites where the research actually found infringing content.
 - Use only real, publicly accessible websites.
 - For PATENT assets, always include at least one patent database (patents.google.com or worldwide.espacenet.com) alongside commercial sites.
-- For TRADEMARK assets, always include at least one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}) to check for domain squatting.`;
+- For TRADEMARK assets, always include at least one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}) to check for domain squatting.
+- Do not fabricate findings — if the research found nothing, say so in the description and use generic high-risk platforms for targetSites.`;
 
   const completion = await chatWithRetry([
     {

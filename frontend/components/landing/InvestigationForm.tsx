@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { startInvestigation, type AssetType } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 const ASSET_TYPES: {
   id: AssetType;
@@ -17,12 +18,12 @@ const ASSET_TYPES: {
 
 export default function InvestigationForm() {
   const router = useRouter();
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedType, setSelectedType] = useState<AssetType>("trademark");
   const [assetName, setAssetName] = useState("");
   const [primaryUrl, setPrimaryUrl] = useState("");
-  const [email, setEmail] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -38,14 +39,17 @@ export default function InvestigationForm() {
     e.preventDefault();
     if (!assetName.trim()) return;
 
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // TODO: wire to real backend via startInvestigation()
       const { scanId } = await startInvestigation({
         assetType: selectedType,
         assetName,
         primaryUrl,
-        email: email.trim() || undefined,
         file: file ?? undefined,
       });
       router.push(`/scan/${scanId}`);
@@ -57,10 +61,8 @@ export default function InvestigationForm() {
 
   return (
     <div className="lg:col-span-7 space-y-4">
-      {/* Main form card */}
       <div className="bg-surface-container p-1 shadow-2xl">
         <div className="bg-surface-container-lowest p-8 border border-[#524533]/10">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8 border-b border-[#524533]/10 pb-4">
             <h2 className="font-headline text-xl font-medium tracking-tight uppercase">
               New Investigation
@@ -68,7 +70,6 @@ export default function InvestigationForm() {
           </div>
 
           <form className="space-y-8" onSubmit={handleSubmit}>
-            {/* Asset type selector */}
             <div>
               <label className="block text-[10px] font-label font-bold text-outline uppercase tracking-widest mb-4">
                 Select Asset Classification
@@ -96,7 +97,6 @@ export default function InvestigationForm() {
               </div>
             </div>
 
-            {/* Text inputs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-[10px] font-label font-bold text-outline uppercase tracking-widest">
@@ -124,21 +124,6 @@ export default function InvestigationForm() {
               </div>
             </div>
 
-            {/* Email notification */}
-            <div className="space-y-2">
-              <label className="block text-[10px] font-label font-bold text-outline uppercase tracking-widest">
-                Notify via Email (optional)
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data px-3 py-3 transition-all placeholder:text-outline/50"
-              />
-            </div>
-
-            {/* File upload */}
             <div
               className={`border border-dashed p-8 flex flex-col items-center justify-center bg-surface-container-low/50 group cursor-pointer hover:bg-surface-container-low transition-colors ${
                 dragging
@@ -179,7 +164,6 @@ export default function InvestigationForm() {
               )}
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading || !assetName.trim()}
@@ -191,6 +175,13 @@ export default function InvestigationForm() {
                     sync
                   </span>
                   INITIALIZING...
+                </>
+              ) : !user ? (
+                <>
+                  SIGN IN TO MONITOR
+                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
+                    login
+                  </span>
                 </>
               ) : (
                 <>
@@ -204,7 +195,6 @@ export default function InvestigationForm() {
           </form>
         </div>
       </div>
-
     </div>
   );
 }

@@ -10,15 +10,20 @@ An AI-powered web application that automatically scans the internet for copyrigh
 User submits asset (name, type, URL, file)
         │
         ▼
-  GPT-4o analyses the asset
-  → generates description, key features, and a
-    list of 3–12 high-risk target websites
+  GPT-4o performs live web research
+  → searches for known knockoffs, copycats,
+    and platforms where infringement has occurred
+        │
+        ▼
+  GPT-4o analyses findings
+  → generates description, key features, keywords, and
+    3–4 high-risk target websites ranked by likelihood
         │
         ▼
   TinyFish browser agents dispatched to all
   target sites concurrently (run-async)
-  → each agent actively searches the site,
-    navigates results, and identifies matches
+  → each agent searches the site, navigates results,
+    and identifies matches
         │
         ▼
   Matches mapped to structured infringement
@@ -38,48 +43,66 @@ User submits asset (name, type, URL, file)
 |---|---|
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
 | Backend | Node.js, Express |
-| AI Analysis | OpenAI GPT-4o |
+| AI Analysis | OpenAI GPT-4o (with web_search_preview) |
 | Web Scraping | TinyFish browser automation (run-async) |
-| Database | PostgreSQL |
-| Email | Nodemailer |
-| PDF Export | PDFKit |
+| Database | PostgreSQL (Neon serverless) |
+| Authentication | Email OTP + JWT (access + refresh tokens) |
+| Email | Nodemailer (SMTP) |
+| PDF Export | jsPDF (client-side) |
 
 ---
 
 ## Project Structure
 
 ```
-tinyfishHack/
+TraceGuard/
 ├── frontend/                  # Next.js app
 │   ├── app/
 │   │   ├── page.tsx           # Landing page + investigation form
+│   │   ├── login/             # Email OTP login
+│   │   ├── dashboard/         # User scan history
 │   │   ├── scan/[id]/page.tsx # Live scan dashboard (polls every 3s)
 │   │   └── report/[id]/page.tsx # Infringement report
 │   ├── components/
 │   │   ├── landing/           # Hero, form, architecture diagram
-│   │   ├── scan/              # TerminalLog, DataStream
+│   │   ├── layout/            # Top nav, footer
 │   │   └── report/            # InfringementCard, filters, panel
-│   └── lib/api.ts             # Typed API client
+│   └── lib/
+│       ├── api.ts             # Typed API client
+│       └── auth-context.tsx   # Auth state provider
 │
 └── backend/                   # Express server
     └── src/
         ├── server.js          # Entry point, CORS, routes
         ├── store.js           # PostgreSQL data layer
+        ├── db.js              # Neon connection pool + schema init
+        ├── middleware/
+        │   └── auth.js        # JWT requireAuth middleware
         ├── routes/
+        │   ├── auth.js        # OTP + JWT auth endpoints
         │   ├── investigations.js
         │   ├── scans.js
         │   ├── reports.js
         │   └── infringements.js
         └── services/
-            ├── gemini.js      # GPT-4o asset analysis
+            ├── gemini.js      # GPT-4o asset analysis + live research
             ├── tinyfish.js    # Bulk async browser scraping
             ├── scanner.js     # Main scan orchestrator
-            └── email.js       # Completion notifications
+            └── email.js       # OTP + completion notifications
 ```
 
 ---
 
 ## API Reference
+
+### Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/request-otp` | Send a 6-digit OTP to the given email (rate-limited: 1/min) |
+| `POST` | `/api/auth/verify-otp` | Verify OTP, returns access token + sets refresh cookie |
+| `POST` | `/api/auth/refresh` | Renew access token using refresh cookie |
+| `POST` | `/api/auth/logout` | Clear refresh token |
+| `GET` | `/api/auth/me` | Get authenticated user profile |
 
 ### Investigations
 | Method | Endpoint | Description |
@@ -158,16 +181,17 @@ tinyfishHack/
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL database
+- PostgreSQL database (Neon serverless recommended)
 - OpenAI API key — [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 - TinyFish API key — [tinyfish.ai](https://tinyfish.ai)
+- SMTP server (for OTP emails and scan completion notifications)
 
 ### Backend
 
 ```bash
 cd backend
 cp .env.example .env
-# Fill in your API keys and database URL in .env
+# Fill in your API keys and settings in .env
 npm install
 npm run dev
 ```
@@ -181,10 +205,21 @@ TINYFISH_API_KEY=sk-tinyfish-...
 TINYFISH_POLL_INTERVAL=5000    # ms between status polls (default 5000)
 TINYFISH_TIMEOUT=600000        # max wait per job in ms (default 10 min)
 
-DATABASE_URL=postgresql://user:password@localhost:5432/ipguardian
+DATABASE_URL=postgresql://user:password@host/dbname
 
 PORT=4000
-FRONTEND_ORIGIN=http://localhost:3000,http://localhost:3001
+FRONTEND_ORIGIN=http://localhost:3000
+
+JWT_SECRET=<generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))">
+
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=user@example.com
+SMTP_PASS=password
+SMTP_FROM=noreply@traceguard.com   # optional, defaults to SMTP_USER
+
+NODE_ENV=development               # set to "production" to enable secure cookies
 ```
 
 ### Frontend
@@ -205,17 +240,23 @@ NEXT_PUBLIC_API_BASE_URL=https://your-backend-domain.com
 
 ## Scan Pipeline Detail
 
-### Phase 1 — GPT-4o Asset Analysis
-GPT-4o receives the asset type, name, URL, and filename. It returns:
-- A detailed description of the asset
+### Phase 1 — Live Web Research
+GPT-4o uses the `web_search_preview` tool to actively search the web for:
+- Factual details about the asset (owner, what makes it legally distinctive)
+- Known knockoffs, copycats, or counterfeits already documented online
+- Platforms where infringing content has already appeared
+
+### Phase 2 — Structured Asset Analysis
+The live research findings are fed into a second GPT-4o call that produces:
+- A detailed factual description of the asset
 - Up to 8 key features or claims
 - Up to 10 search keywords
-- 3–12 target websites ranked by infringement likelihood, each with a category (`E_COMMERCE`, `SOCIAL_MEDIA`, `DOMAIN_SQUATTING`, `NFT_CRYPTO`, `PATENT_DATABASE`, `MARKETPLACE`)
+- 3–4 target websites ranked by infringement likelihood (prioritising sites where infringing content was actually found), each with a category (`E_COMMERCE`, `SOCIAL_MEDIA`, `DOMAIN_SQUATTING`, `NFT_CRYPTO`, `PATENT_DATABASE`, `MARKETPLACE`)
 
 Rate limiting: 3 retries with 10s/20s backoff on 429s.
 
-### Phase 2 — TinyFish Bulk Scraping
-All target websites are submitted **simultaneously** via `POST /v1/automation/run-async`, which returns a `run_id` immediately. All jobs are then polled **in parallel** via `GET /v1/runs/{run_id}` every 5 seconds.
+### Phase 3 — TinyFish Bulk Scraping
+All target websites are submitted **simultaneously** via `POST /v1/automation/run-async`, which returns a `run_id` immediately. All jobs are then polled **in parallel** every 5 seconds.
 
 Total scan time ≈ the slowest single site (not the sum of all sites).
 
@@ -225,7 +266,7 @@ Each browser agent is instructed to:
 3. Open and inspect any related listings
 4. Flag matches if **any single key feature** is replicated — even partially
 
-### Phase 3 — Report Assembly
+### Phase 4 — Report Assembly
 TinyFish match objects are mapped to the frontend's `Infringement` schema:
 
 | TinyFish field | Frontend field |
@@ -238,10 +279,29 @@ TinyFish match objects are mapped to the frontend's `Infringement` schema:
 
 ---
 
+## Authentication
+
+TraceGuard uses passwordless email OTP authentication:
+
+1. User enters their email on `/login`
+2. A 6-digit OTP is generated, hashed (with salt), and emailed via Nodemailer
+3. User enters the OTP (valid for 10 minutes, single-use)
+4. On success, a JWT access token is issued (15-min expiry) and a refresh token is set as a secure `httpOnly` cookie (7-day expiry)
+5. All protected routes require `Authorization: Bearer <token>`
+6. New users are automatically created on first login
+
+---
+
 ## Frontend Pages
 
-### `/` — Investigation Form
+### `/` — Landing & Investigation Form
 Select asset type (Trademark, Copyright, Product, Patent), enter asset name and primary URL, optionally provide an email for completion notification and a reference file. Submits to the backend and redirects to the scan page.
+
+### `/login` — Email OTP Login
+Enter email to receive a 6-digit code, then verify to sign in or create an account.
+
+### `/dashboard` — Scan History
+Lists all scans for the authenticated user with status, alert counts, and links to reports.
 
 ### `/scan/[id]` — Live Scan Dashboard
 Polls `/api/scans/:id` every 3 seconds. Shows:
@@ -255,4 +315,4 @@ Displays all detected infringements with:
 - Filter sidebar (by severity, source type, status)
 - Infringement cards showing domain, match %, severity badge, matched features, and system notes
 - Per-item actions: Draft Cease & Desist, View Full Trace
-- Export PDF and Mark All Reviewed bulk actions
+- Export PDF (client-side via jsPDF) and Mark All Reviewed bulk actions

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { Infringement } from "@/lib/api";
 
 interface InfringementCardProps {
@@ -41,7 +40,7 @@ export default function InfringementCard({ item }: InfringementCardProps) {
     return `mailto:?subject=${subject}&body=${body}`;
   })();
 
-  const sourceHref = `https://${item.domain}`;
+  const sourceHref = item.link ?? `https://${item.domain}`;
 
   return (
     <article className={`bg-[#1d2026] group relative ${style.border}`}>

@@ -1,17 +1,12 @@
 import { Router } from "express";
-import { createScan } from "../store.js";
+import { createScan, getUserById } from "../store.js";
 import { runScan } from "../services/scanner.js";
 
 const router = Router();
 
-/**
- * POST /api/investigations
- * Body: { assetType, assetName, primaryUrl?, fileName? }
- * Returns: { scanId }
- */
 router.post("/", async (req, res) => {
   try {
-    const { assetType, assetName, primaryUrl, fileName, email } = req.body ?? {};
+    const { assetType, assetName, primaryUrl, fileName } = req.body ?? {};
 
     if (!assetName || typeof assetName !== "string" || !assetName.trim()) {
       return res.status(400).json({ error: "assetName is required" });
@@ -24,15 +19,16 @@ router.post("/", async (req, res) => {
         .json({ error: `assetType must be one of: ${validTypes.join(", ")}` });
     }
 
+    const user = await getUserById(req.userId);
     const assetData = {
       assetType,
       assetName: assetName.trim(),
       primaryUrl: primaryUrl?.trim() || undefined,
       fileName: fileName?.trim() || undefined,
-      email: email?.trim() || undefined,
+      email: user?.email ?? undefined,
     };
 
-    const scanId = await createScan(assetType, assetName.trim(), assetData);
+    const scanId = await createScan(assetType, assetName.trim(), assetData, req.userId);
 
     runScan(scanId, assetData).catch((err) =>
       console.error(`[investigations] Background scan ${scanId} crashed:`, err)
