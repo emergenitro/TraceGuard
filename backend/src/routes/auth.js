@@ -94,6 +94,10 @@ router.post("/refresh", async (req, res) => {
     const user = await getUserById(record.user_id);
     if (!user) return res.status(401).json({ error: "Unauthorized" });
 
+    await deleteRefreshToken(token);
+    const newRefreshToken = await createRefreshToken(user.id);
+    res.cookie(REFRESH_COOKIE, newRefreshToken, COOKIE_OPTS);
+
     const accessToken = signAccessToken(user.id);
     res.json({ accessToken, user });
   } catch (err) {

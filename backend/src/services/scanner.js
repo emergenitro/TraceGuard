@@ -88,7 +88,7 @@ function elapsedMs() {
 // ── Goal builder ──────────────────────────────────────────────────────────────
 
 function buildScrapeGoal(assetType, assetName, analysis) {
-  return `You are an aggressive IP infringement detection agent working on behalf of the rights holder. Your job is to FIND potential infringement — not to clear sites of suspicion.
+  return `You are an IP infringement detection agent working on behalf of the rights holder. Your job is to identify credible infringement — not to flag every superficially related result.
 
 PROTECTED ASSET
   Type:     ${assetType.toUpperCase()}
@@ -98,19 +98,18 @@ PROTECTED ASSET
     ${analysis.keyFeatures.map((f, i) => `${i + 1}. ${f}`).join("\n    ")}
   Search keywords: ${analysis.keywords.join(", ")}
 
-MANDATORY STEPS — complete ALL of them before returning results:
+STEPS:
 1. Use the site's own search bar (or search URL) to search for EACH of these terms separately: ${analysis.keywords.slice(0, 5).join(", ")}.
-2. For every search, scroll through at least the first two pages of results.
-3. Open any listing that looks remotely related to the asset and inspect it in detail.
-4. Also browse the most relevant category pages (e.g. for e-commerce: matching product categories; for social media: profiles or posts using the asset name).
+2. For every search, review the first page of results.
+3. Open listings that appear meaningfully related to the asset and inspect them.
+4. Browse the most relevant category pages if applicable.
 
-DETECTION RULES — flag a match if ANY of the following apply:
-- The product/content replicates one or more key features listed above, even partially.
-- The name, branding, or description is confusingly similar to "${assetName}".
-- The functionality, design, or creative output substantially overlaps with the asset's description.
-- The item is clearly a copy, counterfeit, or derivative work.
-- The item implements the same technical approach described in the key features.
-DO NOT require all features to match — a single meaningful feature overlap is enough to flag at LOW or MEDIUM.
+DETECTION RULES — flag a match only if the evidence is reasonably clear:
+- The product/content replicates multiple key features listed above, not just a single generic one.
+- The name, branding, or description is substantially and confusingly similar to "${assetName}" — not merely in the same category.
+- The functionality, design, or creative output clearly and substantially overlaps with the asset's description.
+- The item is an obvious copy, counterfeit, or derivative work with little independent originality.
+Do not flag items that merely share a broad category or general concept with the protected asset.
 
 Return your findings as a JSON object with ONLY this structure (no markdown, no surrounding text):
 {
@@ -138,8 +137,8 @@ match_percent: an integer from 0–100 representing how closely this item matche
   LOW risk    → 25–54
 Use your judgment within the range — do not pick the same number for every result.
 
-Err on the side of inclusion — if you are unsure, flag it as LOW rather than omitting it.
-If after completing all mandatory steps you find genuinely nothing related, return: {"matches": []}`;
+If you are unsure whether something qualifies, omit it rather than flagging it.
+If after completing all steps you find nothing that clearly meets the criteria above, return: {"matches": []}`;
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
