@@ -17,10 +17,11 @@ import { requireAuth } from "../middleware/auth.js";
 const router = Router();
 
 const REFRESH_COOKIE = "tg_refresh";
+const IS_PROD = process.env.NODE_ENV === "production";
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  secure: IS_PROD,
+  sameSite: IS_PROD ? "none" : "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: "/",
 };
@@ -87,7 +88,7 @@ router.post("/refresh", async (req, res) => {
 
     const record = await getRefreshToken(token);
     if (!record || new Date() > new Date(record.expires_at)) {
-      res.clearCookie(REFRESH_COOKIE, { path: "/" });
+      res.clearCookie(REFRESH_COOKIE, { path: "/", secure: IS_PROD, sameSite: IS_PROD ? "none" : "strict" });
       return res.status(401).json({ error: "Session expired" });
     }
 
@@ -110,7 +111,7 @@ router.post("/logout", async (req, res) => {
   try {
     const token = req.cookies?.[REFRESH_COOKIE];
     if (token) await deleteRefreshToken(token);
-    res.clearCookie(REFRESH_COOKIE, { path: "/" });
+    res.clearCookie(REFRESH_COOKIE, { path: "/", secure: IS_PROD, sameSite: IS_PROD ? "none" : "strict" });
     res.status(204).send();
   } catch (err) {
     console.error("[auth] logout error:", err);
