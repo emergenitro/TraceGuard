@@ -11,6 +11,7 @@ const STATUS_LABEL: Record<DashboardScan["status"], string> = {
   queued: "QUEUED",
   scanning: "SCANNING",
   paused: "PAUSED",
+  stopped: "STOPPED",
   complete: "COMPLETE",
 };
 
@@ -18,6 +19,7 @@ const STATUS_COLOR: Record<DashboardScan["status"], string> = {
   queued: "text-outline",
   scanning: "text-[#ffd597]",
   paused: "text-[#ffb3ae]",
+  stopped: "text-[#cf6679]",
   complete: "text-[#4caf7d]",
 };
 
