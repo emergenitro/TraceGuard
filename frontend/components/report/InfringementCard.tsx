@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import type { Infringement } from "@/lib/api";
+import { draftCeaseAndDesist } from "@/lib/api";
 
 interface InfringementCardProps {
   item: Infringement;
@@ -29,16 +31,18 @@ const SEVERITY_STYLES: Record<
 
 export default function InfringementCard({ item }: InfringementCardProps) {
   const style = SEVERITY_STYLES[item.severity];
+  const [drafting, setDrafting] = useState(false);
 
-  const ceaseAndDesistHref = (() => {
-    const subject = encodeURIComponent(
-      `Cease and Desist Notice – Intellectual Property Infringement by ${item.domain}`
-    );
-    const body = encodeURIComponent(
-      `Dear Sir/Madam,\n\nIt has come to our attention that ${item.domain} is engaged in activity that constitutes infringement of our intellectual property rights. Our systems have identified a ${item.matchPercent}% similarity match with our protected assets (${item.tags.join(", ")}).\n\nWe hereby demand that you immediately cease and desist from any further use of our trademarks, brand identity, or related intellectual property. This includes, but is not limited to, the unauthorized use of our brand name, logo, product imagery, or any confusingly similar marks.\n\nFailure to comply within 14 days of receipt of this notice may result in legal action, including injunctive relief and claims for damages.\n\nPlease respond in writing to confirm your compliance.\n\nRegards,\n[Your Name]\n[Your Organization]\n[Contact Information]`
-    );
-    return `mailto:?subject=${subject}&body=${body}`;
-  })();
+  async function handleCeaseAndDesist() {
+    setDrafting(true);
+    try {
+      const { subject, body, to } = await draftCeaseAndDesist(item.id);
+      const toParam = to ? `${encodeURIComponent(to)}` : "";
+      window.location.href = `mailto:${toParam}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    } finally {
+      setDrafting(false);
+    }
+  }
 
   const sourceHref = item.link ?? `https://${item.domain}`;
 
@@ -89,12 +93,13 @@ export default function InfringementCard({ item }: InfringementCardProps) {
 
           {/* Actions */}
           <div className="flex gap-2">
-            <a
-              href={ceaseAndDesistHref}
-              className="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110 transition text-center"
+            <button
+              onClick={handleCeaseAndDesist}
+              disabled={drafting}
+              className="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110 transition text-center disabled:opacity-60"
             >
-              DRAFT CEASE &amp; DESIST
-            </a>
+              {drafting ? "DRAFTING..." : "DRAFT CEASE & DESIST"}
+            </button>
             <a
               href={sourceHref}
               target="_blank"

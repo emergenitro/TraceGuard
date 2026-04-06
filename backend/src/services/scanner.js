@@ -121,7 +121,8 @@ Return your findings as a JSON object with ONLY this structure (no markdown, no 
       "matched_features": ["exact feature from the list that is matched", "another matched feature"],
       "risk_level": "HIGH",
       "similarity_score": "HIGH",
-      "match_percent": 92
+      "match_percent": 92,
+      "contact_email": "any contact or seller email address visible on this specific page — null if none is visible"
     }
   ]
 }
@@ -248,10 +249,11 @@ export async function runScan(scanId, assetData) {
           systemNote:
             match.reason ??
             "Potential infringement detected via automated browser scan.",
-          screenshotUrl: undefined,
+          screenshotUrl: result.raw?.screenshot_url,
           // Internal fields for downstream endpoints
           _link: matchLink,
           _productTitle: match.product_title,
+          _cdEmail: match.contact_email ?? null,
         };
 
         infringements.push(infringement);

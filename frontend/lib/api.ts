@@ -227,8 +227,8 @@ export async function markAllReviewed(scanId: string): Promise<void> {
 
 export async function draftCeaseAndDesist(
   infringementId: string
-): Promise<{ documentId: string }> {
-  return request<{ documentId: string }>(
+): Promise<{ documentId: string; subject: string; body: string; to: string | null }> {
+  return request<{ documentId: string; subject: string; body: string; to: string | null }>(
     `/api/infringements/${infringementId}/cease-and-desist`,
     { method: "POST" }
   );

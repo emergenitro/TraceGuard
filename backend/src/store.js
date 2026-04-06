@@ -35,6 +35,7 @@ function rowToInfringement(row) {
     screenshotUrl: row.screenshot_url,
     link: row.link,
     _productTitle: row.product_title,
+    cdEmail: row.cd_email ?? null,
   };
 }
 
@@ -123,8 +124,8 @@ export async function createReport(scanId, infringementList) {
   if (infringementList.length > 0) {
     const placeholders = infringementList
       .map((_, idx) => {
-        const b = idx * 12;
-        return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8},$${b+9},$${b+10},$${b+11},$${b+12})`;
+        const b = idx * 13;
+        return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8},$${b+9},$${b+10},$${b+11},$${b+12},$${b+13})`;
       })
       .join(", ");
 
@@ -141,11 +142,12 @@ export async function createReport(scanId, infringementList) {
       inf.screenshotUrl ?? null,
       inf._link ?? null,
       inf._productTitle ?? null,
+      inf._cdEmail ?? null,
     ]);
 
     await pool.query(
       `INSERT INTO infringements
-         (id, scan_id, domain, match_percent, severity, tags, source_type, status, system_note, screenshot_url, link, product_title)
+         (id, scan_id, domain, match_percent, severity, tags, source_type, status, system_note, screenshot_url, link, product_title, cd_email)
        VALUES ${placeholders}`,
       values
     );
@@ -190,6 +192,26 @@ export async function getInfringementWithOwner(id) {
   );
   if (!rows[0]) return null;
   return { ...rowToInfringement(rows[0]), scanUserId: rows[0].scan_user_id };
+}
+
+export async function getInfringementWithScanData(id) {
+  const { rows } = await pool.query(
+    `SELECT i.*, s.user_id AS scan_user_id, s.asset_name, s.asset_type,
+            s.asset_data, s.email AS owner_email
+     FROM infringements i
+     JOIN scans s ON s.id = i.scan_id
+     WHERE i.id = $1`,
+    [id]
+  );
+  if (!rows[0]) return null;
+  return {
+    ...rowToInfringement(rows[0]),
+    scanUserId: rows[0].scan_user_id,
+    assetName: rows[0].asset_name,
+    assetType: rows[0].asset_type,
+    assetData: rows[0].asset_data,
+    ownerEmail: rows[0].owner_email,
+  };
 }
 
 export async function updateInfringement(id, updates) {

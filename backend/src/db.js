@@ -70,8 +70,13 @@ export async function initDb() {
       system_note    TEXT,
       screenshot_url TEXT,
       link           TEXT,
-      product_title  TEXT
+      product_title  TEXT,
+      cd_email       TEXT
     )
+  `);
+
+  await pool.query(`
+    ALTER TABLE infringements ADD COLUMN IF NOT EXISTS cd_email TEXT
   `);
 
   console.log("  Database tables ready");
