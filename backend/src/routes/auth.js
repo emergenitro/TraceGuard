@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { rateLimit } from "express-rate-limit";
+import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import jwt from "jsonwebtoken";
 import {
   getUserByEmail,
@@ -21,7 +21,7 @@ const router = Router();
 const otpVerifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  keyGenerator: (req) => (req.body?.email ?? req.ip).toLowerCase(),
+  keyGenerator: (req) => (req.body?.email ?? ipKeyGenerator(req)).toLowerCase(),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many attempts. Please request a new code." },

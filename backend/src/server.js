@@ -24,6 +24,7 @@ if (missing.length) {
 }
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = parseInt(process.env.PORT || "4000", 10);
 
 const corsOptions = {
